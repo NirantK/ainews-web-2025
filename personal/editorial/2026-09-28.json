@@ -4,83 +4,390 @@
     "title": "Ember-1 treats wasted reasoning tokens as a model quality problem",
     "summary": "Fireworks says its Kimi K3 based Ember-1 uses roughly 40% fewer reasoning tokens at comparable benchmark performance. The engineering question is which parts of long reasoning traces can be compressed without losing success on harder tasks.",
     "why": "A concrete post-training pattern: optimize answer quality per token, then measure latency and task success together.",
-    "suppress_terms": ["Ember-1", "Fireworks Research"],
-    "tweet_ids": ["2104329978146115998", "2104311573640855903", "2104326522354147793"]
+    "suppress_terms": [
+      "Ember-1",
+      "Fireworks Research"
+    ],
+    "tweet_ids": [
+      "2104329978146115998",
+      "2104311573640855903",
+      "2104326522354147793"
+    ],
+    "broken": {
+      "text": "Long agent loops can make Kimi K3 revisit the same reasoning at every step, consuming output tokens and adding latency.",
+      "url": "https://fireworks.ai/blog/ember-1",
+      "label": "Fireworks analysis"
+    },
+    "fix": {
+      "text": "Fireworks post-trained a Kimi K3 derivative on real coding-agent loops to suppress reasoning that does not change the answer.",
+      "url": "https://fireworks.ai/blog/ember-1",
+      "label": "method"
+    },
+    "evidence": {
+      "text": "Fireworks reports 71.3% fewer reasoning tokens and 39% fewer total tokens in a coding-traffic A/B comparison at the same task success rate; this is a vendor-run result.",
+      "url": "https://fireworks.ai/blog/ember-1",
+      "label": "A/B results"
+    }
   },
   {
     "id": "jev-evals-follow-through",
     "title": "Jev is moving from launch story to practical evaluator",
     "summary": "New discussion frames Jev as a classifier that still needs validation against trusted labels; another paper applies its probability output to detecting alignment failures. This is a follow-up to the Jev, CLM and Laya decision-model wave, rather than a separate launch alert.",
     "why": "Worth a technical post if we can explain when a fast classifier beats an LLM judge, and where calibration or domain shift breaks the case.",
-    "suppress_terms": ["Jev"],
-    "extra_sources": ["https://typesafe.ai/blog/introducing-system-one-models-and-jev", "https://x.com/jackyk02/status/2102905335925424285", "https://www.reddit.com/r/LocalLLaMA/comments/1wl1yzq/i_gave_jev_laya_finetuned_modernce_and_qwen35_the/"],
-    "tweet_ids": ["2104305090743992821", "2104295014117589053", "2104248143739015190"]
+    "suppress_terms": [
+      "Jev"
+    ],
+    "extra_sources": [
+      "https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+      "https://x.com/jackyk02/status/2102905335925424285",
+      "https://www.reddit.com/r/LocalLLaMA/comments/1wl1yzq/i_gave_jev_laya_finetuned_modernce_and_qwen35_the/"
+    ],
+    "tweet_ids": [
+      "2104305090743992821",
+      "2104295014117589053",
+      "2104248143739015190"
+    ],
+    "broken": {
+      "text": "Generative LLM judges decode for every criterion, which makes repeated evaluation costly; fixed-label classifiers are less flexible.",
+      "url": "https://arxiv.org/abs/2609.29429",
+      "label": "paper"
+    },
+    "fix": {
+      "text": "Jev answers typed decisions with probabilities in one call. CLM and Laya are nearby specialized-decision approaches worth comparing, rather than treating Jev as an isolated model launch.",
+      "url": "https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+      "label": "Jev design",
+      "related": [
+        {
+          "label": "CLM",
+          "url": "https://x.com/jackyk02/status/2102905335925424285"
+        },
+        {
+          "label": "Laya comparison",
+          "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wl1yzq/i_gave_jev_laya_finetuned_modernce_and_qwen35_the/"
+        }
+      ]
+    },
+    "evidence": {
+      "text": "A new study reports median AUROC 0.886 across alignment-failure benchmarks and 63× lower cost than its LLM-judge scorers. Thresholds still need calibration on each benchmark.",
+      "url": "https://arxiv.org/abs/2609.29429",
+      "label": "study"
+    }
   },
   {
     "id": "mimo-tool-call-repetition",
     "title": "MiMo’s repeated tool calls reveal a useful agent failure mode",
     "summary": "The MiMo team says it found and fixed a repetition issue in the V2.6 family that caused similar tool calls to recur, consuming context and stalling tasks. The fix is more interesting than another leaderboard number if the diagnosis is reproducible.",
     "why": "Practical lesson for agent builders: detect tool-call loops and evaluate wasted context, not just final task success.",
-    "suppress_terms": ["MiMo-V2.6"],
-    "tweet_ids": ["2104251067039191324"]
+    "suppress_terms": [
+      "MiMo-V2.6"
+    ],
+    "tweet_ids": [
+      "2104251067039191324"
+    ],
+    "broken": {
+      "text": "MiMo-V2.6 could repeat nearly identical tool calls and stall. Its RL reward focused on final answers, while the flooding penalty ignored turns with 32 or fewer tool calls.",
+      "url": "https://mimo.xiaomi.com/blog/mimo-v2-6-tool-call-repetition",
+      "label": "postmortem"
+    },
+    "fix": {
+      "text": "The team trained a small repetition-focused RL teacher and merged it into the model through MOPD, at about 4% of a full mixRL retrain cost.",
+      "url": "https://mimo.xiaomi.com/blog/mimo-v2-6-tool-call-repetition",
+      "label": "fix details"
+    },
+    "evidence": {
+      "text": "Xiaomi reports repetition fell sharply across harnesses and context lengths while benchmark scores held steady. The published metric counts exact duplicate calls within a turn, so it misses some semantic loops.",
+      "url": "https://mimo.xiaomi.com/blog/mimo-v2-6-tool-call-repetition",
+      "label": "measurements"
+    }
   },
   {
     "id": "self-organized-agent-harness",
     "title": "A research harness tests more than 1,000 coding agents without a fixed hierarchy",
     "summary": "A Microsoft Research paper highlighted in the monitored list studies a self-organizing multi-agent harness at more than 1,000 concurrent coding agents. The key question is whether coordination stays useful as the agent count rises.",
     "why": "Potentially relevant to how agent orchestration evolves beyond static manager-worker trees; check the paper and evaluation before posting.",
-    "suppress_terms": ["self-organized multi-agent", "1K+ coding agents"],
-    "tweet_ids": ["2104377054829613473"]
+    "suppress_terms": [
+      "self-organized multi-agent",
+      "1K+ coding agents"
+    ],
+    "tweet_ids": [
+      "2104377054829613473"
+    ],
+    "broken": {
+      "text": "A central orchestrator can become a bottleneck when hundreds of coding agents need tasks, context, and merge coordination.",
+      "url": "https://arxiv.org/abs/2609.26781",
+      "label": "paper"
+    },
+    "fix": {
+      "text": "Agensh replaces central assignment with a shared workspace, message channel, and context store; agents claim tasks, share findings, verify, and merge asynchronously.",
+      "url": "https://arxiv.org/abs/2609.26781",
+      "label": "harness design"
+    },
+    "evidence": {
+      "text": "On five hard ProgramBench tasks, the authors report mean final test-pass rate rising from 19.31% with one agent to 28.78% with 128. On pandoc, 1,024 agents reach 55.06% versus 33.89% for one agent.",
+      "url": "https://arxiv.org/abs/2609.26781",
+      "label": "results"
+    }
   },
   {
     "id": "bend-proof-kernel",
     "title": "Bend says its proof kernel is formally verified",
     "summary": "The Bend team says version 2.0.32 completed proof-kernel formalization and opened a challenge to prove a falsehood through it. That is a stronger claim than merely adding a proof syntax or solver front end.",
     "why": "A technically distinctive formal-methods story. Verify the proof boundary and assumptions before treating the claim as established.",
-    "suppress_terms": ["Bend 2.0.32"],
-    "tweet_ids": ["2104240438127288652"]
+    "suppress_terms": [
+      "Bend 2.0.32"
+    ],
+    "tweet_ids": [
+      "2104240438127288652"
+    ],
+    "broken": {
+      "text": "A proof tool can accept a false proof if the executable checker has an error, regardless of how sound its intended type theory is.",
+      "url": "https://github.com/bendlang/bend/blob/main/README.md",
+      "label": "Bend design"
+    },
+    "fix": {
+      "text": "Bend 2.0.32 adds --verdict, compiling a file to the smaller BendTT proof kernel implemented and verified in Lean; the running kernel is the verified implementation.",
+      "url": "https://x.com/VictorTaelin/status/2104240438127288652",
+      "label": "release details"
+    },
+    "evidence": {
+      "text": "The project links its Lean formalization and offers a challenge to prove a falsehood. Unsafe and FFI code fall outside the guarantee, and the compiler itself is not fully verified.",
+      "url": "https://github.com/bendlang/bend/blob/main/README.md",
+      "label": "scope and code"
+    }
   },
   {
     "id": "robot-in-context-imitation",
     "title": "SAIL studies scaling in-context imitation learning for robotics",
     "summary": "Sakana AI and University of Tokyo introduced SAIL, a robotics study on how a robot can adapt to a new task from demonstrations. This is a research candidate rather than a production launch.",
     "why": "Interesting if its adaptation curve and data requirements improve over task-specific robot training; read the paper before a channel post.",
-    "suppress_terms": ["SAIL", "Scaling In-Context Imitation"],
-    "tweet_ids": ["2104348705956774255"]
+    "suppress_terms": [
+      "SAIL",
+      "Scaling In-Context Imitation"
+    ],
+    "tweet_ids": [
+      "2104348705956774255"
+    ],
+    "broken": {
+      "text": "A one-shot VLM-generated robot trajectory is brittle: small target errors can fail a manipulation task before the physical robot can correct course.",
+      "url": "https://pub.sakana.ai/sail/",
+      "label": "research post"
+    },
+    "fix": {
+      "text": "SAIL tests candidate trajectories in simulation, uses an evaluator VLM for step-level feedback, and explores revisions with Monte Carlo tree search before physical execution.",
+      "url": "https://pub.sakana.ai/sail/",
+      "label": "method"
+    },
+    "evidence": {
+      "text": "Across six simulation tasks, the authors report successful-trajectory discovery rising from 25% with one candidate to 73% with 45. That is a search-budget result, not a claim of general physical reliability.",
+      "url": "https://pub.sakana.ai/sail/",
+      "label": "results"
+    }
   },
   {
     "id": "skillgym-training-environments",
     "title": "SkillGym turns written agent skills into checkable training tasks",
     "summary": "A paper highlighted in the list turns human-written skills into 2,756 environments with code-based checkers, then uses successful trajectories for training. The interesting part is converting instructions into verifiable practice rather than merely adding more prompt context.",
     "why": "A strong candidate for a technical post after reading the paper's evaluation and transfer results.",
-    "tweet_ids": ["2104339055194546595"]
+    "tweet_ids": [
+      "2104339055194546595"
+    ],
+    "broken": {
+      "text": "Putting a written skill into an agent prompt may help one run, but does not teach the model to perform that skill without the prompt.",
+      "url": "https://arxiv.org/abs/2609.27717",
+      "label": "paper"
+    },
+    "fix": {
+      "text": "SkillGym converts human-written skills into 2,756 executable environments with code-based checkers, then trains on successful trajectories.",
+      "url": "https://arxiv.org/abs/2609.27717",
+      "label": "training method"
+    },
+    "evidence": {
+      "text": "The authors report their 35B agent reaches 51.47% on skill-assisted SkillsBench and beats its base model with skills in context even when the trained model has no skills loaded.",
+      "url": "https://arxiv.org/abs/2609.27717",
+      "label": "evaluation"
+    }
   },
   {
     "id": "bioeval-bioengineering",
     "title": "BioEVAL asks how to validate AI on real bioengineering work",
     "summary": "A newly shared paper introduces a multi-institution bioengineering evaluation. The useful question is whether its tasks and validation reflect lab practice rather than exam-style recall.",
     "why": "Could make a good evaluation-methods post if the benchmark design is genuinely harder and better grounded; needs paper review.",
-    "tweet_ids": ["2104482740204896723"]
+    "tweet_ids": [
+      "2104482740204896723"
+    ],
+    "broken": {
+      "text": "Bioengineering model tests often emphasize factual recall, which says little about literature synthesis or experimental image interpretation.",
+      "url": "https://arxiv.org/abs/2609.30489",
+      "label": "paper"
+    },
+    "fix": {
+      "text": "BioEVAL adds 359 audited multiple-choice items, 218 literature-synthesis tasks, and 10 multimodal experimental questions across bioengineering subfields.",
+      "url": "https://arxiv.org/abs/2609.30489",
+      "label": "benchmark design"
+    },
+    "evidence": {
+      "text": "The study reports up to 90% on MCQs but 0.72 similarity on synthesis and 80% accuracy on a small multimodal sample. The latter has only 10 problems, so broad model ranking from it would be premature.",
+      "url": "https://arxiv.org/abs/2609.30489",
+      "label": "results and sample"
+    }
   },
   {
     "id": "graphmemix-agent-memory",
     "title": "GraphMemix proposes a graph approach to long-term multimodal agent memory",
     "summary": "An open-source project reframes retrieval for long-running agents around multimodal memory relationships. Today's scan surfaced the paper announcement; the actual design and results still need inspection.",
     "why": "Relevant to the emerging memory architecture discussion, though the evidence threshold for a channel post should be higher than an announcement.",
-    "tweet_ids": ["2104371367793844299"]
+    "tweet_ids": [
+      "2104371367793844299"
+    ],
+    "broken": {
+      "text": "Independent similarity ranking can miss memories that become useful only when combined with another clue, while also returning redundant context.",
+      "url": "https://arxiv.org/abs/2608.26983",
+      "label": "paper"
+    },
+    "fix": {
+      "text": "GraphMemix constructs a query-aware graph of candidate memories and selects an evidence forest under a reader budget, rewarding complementary information.",
+      "url": "https://arxiv.org/abs/2608.26983",
+      "label": "method"
+    },
+    "evidence": {
+      "text": "The authors report gains on four multimodal memory benchmarks; the announcement cites 61.55% judge-rated accuracy with Qwen3-VL-8B, 11.75 points above its strongest baseline.",
+      "url": "https://arxiv.org/abs/2608.26983",
+      "label": "paper",
+      "related": [
+        {
+          "label": "result breakdown",
+          "url": "https://x.com/TheTuringPost/status/2104371367793844299"
+        }
+      ]
+    },
+    "topic": "Retrieval & search"
+  },
+  {
+    "id": "perplexity-photon-index",
+    "title": "Perplexity Photon cuts the tail latency of search retrieval",
+    "summary": "Perplexity rebuilt its search index around compact posting lists, asynchronous reads, cache-aware batching and a separate indexing path.",
+    "why": "Measure tail latency and answer quality alongside model cost, then redesign the index and serving path together.",
+    "topic": "Retrieval & search",
+    "tweet_ids": [],
+    "extra_sources": [
+      "https://www.perplexity.ai/en-GB/hub/blog/photon"
+    ],
+    "broken": {
+      "text": "The previous search engine had roughly 800 ms p99 latency, with cold page faults and index fusion pushing some queries higher. Index sync and recovery also constrained updates.",
+      "url": "https://www.perplexity.ai/en-GB/hub/blog/photon",
+      "label": "primary source"
+    },
+    "fix": {
+      "text": "Photon uses compact posting-list and per-document structures, batch-aware caching, asynchronous io_uring reads, and index builds isolated from serving. New indexes warm before cutover.",
+      "url": "https://www.perplexity.ai/en-GB/hub/blog/photon",
+      "label": "design"
+    },
+    "evidence": {
+      "text": "Perplexity reports search-engine p99 falling from about 800 ms to 65 ms and roughly 20% fewer serving machines for equivalent load. Its faster API preset trades some broad-search relevance and answer availability for speed and cost; these are vendor measurements.",
+      "url": "https://www.perplexity.ai/en-GB/hub/blog/photon",
+      "label": "reported results"
+    }
+  },
+  {
+    "id": "weaviate-mmr-search-diversity",
+    "title": "Weaviate adds diversity control after hybrid retrieval",
+    "summary": "Weaviate 1.39 makes maximal marginal relevance generally available for hybrid and vector search, diversifying the fused result set before pagination.",
+    "why": "Retrieval quality is more than top-k relevance: diversity and query-time rescoring change what context an agent actually sees.",
+    "topic": "Retrieval & search",
+    "tweet_ids": [],
+    "extra_sources": [
+      "https://weaviate.io/blog/weaviate-1-39-release"
+    ],
+    "broken": {
+      "text": "Hybrid search can return several near-identical chunks at the top, wasting a limited context window and hiding other useful evidence.",
+      "url": "https://weaviate.io/blog/weaviate-1-39-release",
+      "label": "primary source"
+    },
+    "fix": {
+      "text": "Maximal marginal relevance reranks fused results for relevance and diversity before pagination. The release also exposes query-time Boost rescoring for known priorities.",
+      "url": "https://weaviate.io/blog/weaviate-1-39-release",
+      "label": "design"
+    },
+    "evidence": {
+      "text": "Weaviate says MMR is GA in 1.39 and supports hybrid and near searches. Its default balance of 0.0 favors diversity, so relevance-sensitive workloads should set and evaluate the balance explicitly.",
+      "url": "https://weaviate.io/blog/weaviate-1-39-release",
+      "label": "reported results"
+    }
+  },
+  {
+    "id": "jevgrep-agent-code-retrieval",
+    "title": "jevgrep shows the cost-quality tradeoff in agent code search",
+    "summary": "A specialized Jev classifier is being tried as a cheap code-context selector for coding agents. The repository reports a lower token bill, but the small published test also lost one solved task versus baseline.",
+    "why": "Compare specialist classifiers with agentic search on both cost and task success, rather than adopting a parity headline.",
+    "topic": "Retrieval & search",
+    "tweet_ids": [
+      "2104405629993676961"
+    ],
+    "extra_sources": [
+      "https://github.com/dzhng/jevgrep"
+    ],
+    "broken": {
+      "text": "Coding agents can burn tokens and tool calls searching a repository before they reach the files needed for a task.",
+      "url": "https://github.com/dzhng/jevgrep",
+      "label": "primary source"
+    },
+    "fix": {
+      "text": "jevgrep uses a specialized Jev classifier to identify likely relevant code context before the main coding agent works on the task.",
+      "url": "https://github.com/dzhng/jevgrep",
+      "label": "design"
+    },
+    "evidence": {
+      "text": "The README reports cost falling from $7.62 to $4.52 excluding Jev costs, while solve rate fell from 8/10 to 7/10. This ten-task result does not establish quality parity.",
+      "url": "https://github.com/dzhng/jevgrep",
+      "label": "reported results"
+    }
   },
   {
     "id": "minimax-m31-flash-preview",
     "title": "MiniMax M3.1 Flash preview reaches the token plan",
     "summary": "MiniMax announced preview availability aimed at high-volume, latency-sensitive workloads. The monitored post does not provide enough technical detail to assess a model-quality advance.",
     "why": "Keep on the launch coverage radar; post only if independent benchmarks or architecture details make this more than an availability update.",
-    "tweet_ids": ["2104256406786547800"]
+    "tweet_ids": [
+      "2104256406786547800"
+    ],
+    "broken": {
+      "text": "High-volume users want lower latency and cost, but this announcement does not quantify the performance gap or explain a specific failure in prior models.",
+      "url": "https://x.com/MiniMax_AI/status/2104256406786547800",
+      "label": "announcement"
+    },
+    "fix": {
+      "text": "MiniMax made M3.1 Flash Preview available on its Token Plan and describes it as a faster, lighter option.",
+      "url": "https://x.com/MiniMax_AI/status/2104256406786547800",
+      "label": "announcement"
+    },
+    "evidence": {
+      "text": "No architecture detail, independent benchmark, or measured latency comparison appears in the monitored announcement. Keep this on the launch radar pending technical evidence.",
+      "url": "https://x.com/MiniMax_AI/status/2104256406786547800",
+      "label": "current evidence"
+    }
   },
   {
     "id": "imp-dspy-elixir",
     "title": "Imp ports declarative LM programming to Elixir and the BEAM",
     "summary": "Imp brings DSPy-style signatures, optimizers, retrieval, and agent loops into Elixir. Its engineering case is combining LM program optimization with the BEAM's concurrency model.",
     "why": "Potentially useful for readers building production agent systems; inspect the API and optimizer implementation before recommending it.",
-    "tweet_ids": ["2104271342111776832"]
+    "tweet_ids": [
+      "2104271342111776832"
+    ],
+    "broken": {
+      "text": "DSPy-style typed LM programs and optimizers lacked a native implementation for Elixir applications using BEAM processes and supervision.",
+      "url": "https://github.com/deepfates/imp",
+      "label": "project README"
+    },
+    "fix": {
+      "text": "Imp ports signatures, modules, optimizers, retrieval, and agent loops to Elixir, with OTP process supervision and ReqLLM model access.",
+      "url": "https://github.com/deepfates/imp",
+      "label": "implementation"
+    },
+    "evidence": {
+      "text": "Version 0.5 is open source and usable, but its maintainer calls it experimental and says optimizer performance still needs large-scale benchmarking.",
+      "url": "https://github.com/deepfates/imp",
+      "label": "status and limits"
+    }
   }
 ]
