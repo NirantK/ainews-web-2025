@@ -18,6 +18,8 @@ HERE = Path(__file__).resolve().parent
 RUNS = ROOT / "tools" / "scrapers" / "runs"
 OUT = HERE / "output"
 EDITORIAL = HERE / "editorial"
+ACCOUNTS = HERE / "x_accounts.json"
+UPSTREAM_LIST = "list:1585430245762441216"
 
 KEYWORDS = {
     "launch": 5, "released": 5, "introducing": 5, "open weights": 5,
@@ -55,7 +57,8 @@ def latest_run():
     for raw in RUNS.glob("*/twitter/raw.json"):
         try:
             data = json.loads(raw.read_text())
-            if data.get("tweets") and not data.get("diagnostics", {}).get("wasPartial"):
+            if (data.get("tweets") and data.get("diagnostics", {}).get("listId") == UPSTREAM_LIST
+                    and not data.get("diagnostics", {}).get("wasPartial")):
                 candidates.append((raw.stat().st_mtime, raw, data))
         except (OSError, json.JSONDecodeError):
             continue
@@ -64,11 +67,54 @@ def latest_run():
     return max(candidates)
 
 
+def accounts():
+    return json.loads(ACCOUNTS.read_text())
+
+
 def collect():
-    subprocess.run(
-        ["node", "--import", "tsx", "cli.ts", "run", "twitter", "--scrape-only"],
-        cwd=ROOT / "tools" / "scrapers", check=True,
-    )
+    end = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+    start = end - dt.timedelta(days=1)
+    window = ["--start", start.isoformat().replace("+00:00", "Z"),
+              "--end", end.isoformat().replace("+00:00", "Z")]
+    errors = []
+    for target in ["1585430245762441216", *("@" + a["handle"] for a in accounts())]:
+        try:
+            subprocess.run(["node", "--import", "tsx", "cli.ts", "run", "twitter",
+                            "--target", target, *window, "--scrape-only"],
+                           cwd=ROOT / "tools" / "scrapers", check=True)
+        except (OSError, subprocess.CalledProcessError) as exc:
+            errors.append(f"{target}: {exc}")
+    return errors
+
+
+def merge_accounts(data):
+    diagnostics = data["diagnostics"]
+    window = (diagnostics.get("startParam"), diagnostics.get("endParam"))
+    by_id = {str(tweet["id"]): tweet for tweet in data["tweets"]}
+    counts, missing = {}, []
+    for account in accounts():
+        handle = account["handle"]
+        matches = []
+        for raw in RUNS.glob("*/twitter/raw.json"):
+            try:
+                candidate = json.loads(raw.read_text())
+                diag = candidate["diagnostics"]
+                if (diag.get("listId") == f"profile:{handle}"
+                        and (diag.get("startParam"), diag.get("endParam")) == window
+                        and not diag.get("wasPartial")):
+                    matches.append((raw.stat().st_mtime, candidate))
+            except (OSError, KeyError, json.JSONDecodeError):
+                continue
+        if not matches:
+            missing.append("@" + handle)
+            continue
+        profile = max(matches, key=lambda entry: entry[0])[1]
+        counts[handle] = len(profile["tweets"])
+        for tweet in profile["tweets"]:
+            by_id.setdefault(str(tweet["id"]), tweet)
+    merged = {**data, "tweets": list(by_id.values()),
+              "diagnostics": {**diagnostics, "profileCounts": counts, "missingProfiles": missing}}
+    return merged
 
 
 def make_items(tweets, date):
@@ -117,7 +163,12 @@ def render(date, data, raw_path, items, collection_error, live_server):
     diag = data.get("diagnostics", {})
     start = diag.get("startParam", "unknown")
     end = diag.get("endParam", "unknown")
-    coverage = f"{len(data['tweets'])} X posts · {diag.get('pagesFetched', '?')} pages · {html.escape(start)} to {html.escape(end)}"
+    profiles = diag.get("profileCounts", {})
+    additions = " · " + ", ".join(f"@{html.escape(k)}: {v}" for k, v in profiles.items()) if profiles else ""
+    coverage = f"{len(data['tweets'])} X posts · {diag.get('pagesFetched', '?')} list pages{additions} · {html.escape(start)} to {html.escape(end)}"
+    if diag.get("missingProfiles"):
+        missing = ", ".join(html.escape(handle) for handle in diag["missingProfiles"])
+        coverage += f" · Profile scan unavailable: {missing}"
     warning = "" if not collection_error else f'<p class="warning">New collection failed: {html.escape(collection_error)}. This edition uses the last complete saved run.</p>'
     cards = []
     def claim(label, content, fallback_url):
@@ -212,19 +263,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--from-latest", action="store_true", help="Reuse latest complete collection")
     args = parser.parse_args()
-    error = None
+    errors = []
     if not args.from_latest:
-        try:
-            collect()
-        except (OSError, subprocess.CalledProcessError) as exc:
-            error = str(exc)
+        errors = collect()
     _, raw_path, data = latest_run()
+    data = merge_accounts(data)
     date = dt.datetime.now(dt.timezone(dt.timedelta(hours=5, minutes=30))).date().isoformat()
     items = make_items(data["tweets"], date)
     OUT.mkdir(parents=True, exist_ok=True)
     live_server = ensure_server()
     path = OUT / f"{date}.html"
-    path.write_text(render(date, data, raw_path, items, error, live_server))
+    path.write_text(render(date, data, raw_path, items, "; ".join(errors), live_server))
     print(f"http://127.0.0.1:8765/{date}.html" if live_server else path)
     print(f"{len(items)} candidates from {len(data['tweets'])} collected posts; source: {raw_path}")
 
