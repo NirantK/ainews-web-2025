@@ -1,0 +1,51 @@
+[
+  {
+    "id": "ember-1-reasoning-efficiency",
+    "title": "Ember-1 treats wasted reasoning tokens as a model quality problem",
+    "summary": "Fireworks says its Kimi K3 based Ember-1 uses roughly 40% fewer reasoning tokens at comparable benchmark performance. The engineering question is which parts of long reasoning traces can be compressed without losing success on harder tasks.",
+    "why": "A concrete post-training pattern: optimize answer quality per token, then measure latency and task success together.",
+    "suppress_terms": ["Ember-1", "Fireworks Research"],
+    "tweet_ids": ["2104329978146115998", "2104311573640855903", "2104326522354147793"]
+  },
+  {
+    "id": "jev-evals-follow-through",
+    "title": "Jev is moving from launch story to practical evaluator",
+    "summary": "New discussion frames Jev as a classifier that still needs validation against trusted labels; another paper applies its probability output to detecting alignment failures. This is a follow-up to the Jev, CLM and Laya decision-model wave, rather than a separate launch alert.",
+    "why": "Worth a technical post if we can explain when a fast classifier beats an LLM judge, and where calibration or domain shift breaks the case.",
+    "suppress_terms": ["Jev"],
+    "extra_sources": ["https://typesafe.ai/blog/introducing-system-one-models-and-jev", "https://x.com/jackyk02/status/2102905335925424285", "https://www.reddit.com/r/LocalLLaMA/comments/1wl1yzq/i_gave_jev_laya_finetuned_modernce_and_qwen35_the/"],
+    "tweet_ids": ["2104305090743992821", "2104295014117589053", "2104248143739015190"]
+  },
+  {
+    "id": "mimo-tool-call-repetition",
+    "title": "MiMo’s repeated tool calls reveal a useful agent failure mode",
+    "summary": "The MiMo team says it found and fixed a repetition issue in the V2.6 family that caused similar tool calls to recur, consuming context and stalling tasks. The fix is more interesting than another leaderboard number if the diagnosis is reproducible.",
+    "why": "Practical lesson for agent builders: detect tool-call loops and evaluate wasted context, not just final task success.",
+    "suppress_terms": ["MiMo-V2.6"],
+    "tweet_ids": ["2104251067039191324"]
+  },
+  {
+    "id": "self-organized-agent-harness",
+    "title": "A research harness tests more than 1,000 coding agents without a fixed hierarchy",
+    "summary": "A Microsoft Research paper highlighted in the monitored list studies a self-organizing multi-agent harness at more than 1,000 concurrent coding agents. The key question is whether coordination stays useful as the agent count rises.",
+    "why": "Potentially relevant to how agent orchestration evolves beyond static manager-worker trees; check the paper and evaluation before posting.",
+    "suppress_terms": ["self-organized multi-agent", "1K+ coding agents"],
+    "tweet_ids": ["2104377054829613473"]
+  },
+  {
+    "id": "bend-proof-kernel",
+    "title": "Bend says its proof kernel is formally verified",
+    "summary": "The Bend team says version 2.0.32 completed proof-kernel formalization and opened a challenge to prove a falsehood through it. That is a stronger claim than merely adding a proof syntax or solver front end.",
+    "why": "A technically distinctive formal-methods story. Verify the proof boundary and assumptions before treating the claim as established.",
+    "suppress_terms": ["Bend 2.0.32"],
+    "tweet_ids": ["2104240438127288652"]
+  },
+  {
+    "id": "robot-in-context-imitation",
+    "title": "SAIL studies scaling in-context imitation learning for robotics",
+    "summary": "Sakana AI and University of Tokyo introduced SAIL, a robotics study on how a robot can adapt to a new task from demonstrations. This is a research candidate rather than a production launch.",
+    "why": "Interesting if its adaptation curve and data requirements improve over task-specific robot training; read the paper before a channel post.",
+    "suppress_terms": ["SAIL", "Scaling In-Context Imitation"],
+    "tweet_ids": ["2104348705956774255"]
+  }
+]

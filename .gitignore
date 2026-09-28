@@ -30,3 +30,7 @@ pnpm-debug.log*
 .dev.vars*
 
 .cache/
+tools/scrapers/runs/
+personal/output/
+personal/feedback/
+personal/__pycache__/
