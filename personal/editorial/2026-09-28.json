@@ -47,5 +47,40 @@
     "why": "Interesting if its adaptation curve and data requirements improve over task-specific robot training; read the paper before a channel post.",
     "suppress_terms": ["SAIL", "Scaling In-Context Imitation"],
     "tweet_ids": ["2104348705956774255"]
+  },
+  {
+    "id": "skillgym-training-environments",
+    "title": "SkillGym turns written agent skills into checkable training tasks",
+    "summary": "A paper highlighted in the list turns human-written skills into 2,756 environments with code-based checkers, then uses successful trajectories for training. The interesting part is converting instructions into verifiable practice rather than merely adding more prompt context.",
+    "why": "A strong candidate for a technical post after reading the paper's evaluation and transfer results.",
+    "tweet_ids": ["2104339055194546595"]
+  },
+  {
+    "id": "bioeval-bioengineering",
+    "title": "BioEVAL asks how to validate AI on real bioengineering work",
+    "summary": "A newly shared paper introduces a multi-institution bioengineering evaluation. The useful question is whether its tasks and validation reflect lab practice rather than exam-style recall.",
+    "why": "Could make a good evaluation-methods post if the benchmark design is genuinely harder and better grounded; needs paper review.",
+    "tweet_ids": ["2104482740204896723"]
+  },
+  {
+    "id": "graphmemix-agent-memory",
+    "title": "GraphMemix proposes a graph approach to long-term multimodal agent memory",
+    "summary": "An open-source project reframes retrieval for long-running agents around multimodal memory relationships. Today's scan surfaced the paper announcement; the actual design and results still need inspection.",
+    "why": "Relevant to the emerging memory architecture discussion, though the evidence threshold for a channel post should be higher than an announcement.",
+    "tweet_ids": ["2104371367793844299"]
+  },
+  {
+    "id": "minimax-m31-flash-preview",
+    "title": "MiniMax M3.1 Flash preview reaches the token plan",
+    "summary": "MiniMax announced preview availability aimed at high-volume, latency-sensitive workloads. The monitored post does not provide enough technical detail to assess a model-quality advance.",
+    "why": "Keep on the launch coverage radar; post only if independent benchmarks or architecture details make this more than an availability update.",
+    "tweet_ids": ["2104256406786547800"]
+  },
+  {
+    "id": "imp-dspy-elixir",
+    "title": "Imp ports declarative LM programming to Elixir and the BEAM",
+    "summary": "Imp brings DSPy-style signatures, optimizers, retrieval, and agent loops into Elixir. Its engineering case is combining LM program optimization with the BEAM's concurrency model.",
+    "why": "Potentially useful for readers building production agent systems; inspect the API and optimizer implementation before recommending it.",
+    "tweet_ids": ["2104271342111776832"]
   }
 ]

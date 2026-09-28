@@ -88,7 +88,7 @@ def make_items(tweets, date):
             })
     ranked = sorted((t for t in tweets if str(t["id"]) not in used and not any(term.lower() in t.get("text", "").lower() for term in suppress_terms)), key=score, reverse=True)
     for t in ranked:
-        if len(items) >= 12:
+        if len(items) >= 11:
             break
         if score(t) < 12:
             break
